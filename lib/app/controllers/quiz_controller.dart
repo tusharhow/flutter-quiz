@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 class QuizController extends GetxController {
   var currentQuestionIndex = 0;
-  int seconds = 60;
+  int seconds = 10;
   Timer? timer;
   late Future quiz;
   int points = 0;
@@ -47,29 +47,18 @@ class QuizController extends GetxController {
     var response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      var data = jsonDecode(response.body.toString());
-      print("Success, data: $data");
+      var data = jsonDecode(response.body);
       return data;
     } else {
-      Get.snackbar(
-        "Error",
-        "Something went wrong",
-        snackPosition: SnackPosition.BOTTOM,
-        colorText: Colors.white,
-        backgroundColor: Colors.red,
-        borderRadius: 10,
-        margin: const EdgeInsets.all(10),
-        borderColor: Colors.red,
-        borderWidth: 2,
-      );
+      throw Exception("Failed to load data");
     }
   }
 
   @override
   void onInit() {
     quiz = getQuiz();
-    super.onInit();
     startTimer();
+    super.onInit();
   }
 
   @override

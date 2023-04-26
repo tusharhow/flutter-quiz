@@ -5,17 +5,12 @@ import 'package:get/get.dart';
 import '../utils/colors.dart';
 import '../utils/text_styles.dart';
 
-class QuizScreen extends StatefulWidget {
+class QuizScreen extends StatelessWidget {
   const QuizScreen({Key? key}) : super(key: key);
 
   @override
-  State<QuizScreen> createState() => _QuizScreenState();
-}
-
-class _QuizScreenState extends State<QuizScreen> {
-  @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
         child: GetBuilder<QuizController>(
@@ -40,7 +35,7 @@ class _QuizScreenState extends State<QuizScreen> {
                           onTap: () {
                             controller.resetColors();
                             controller.currentQuestionIndex = 0;
-                            controller.seconds = 60;
+                            controller.seconds = 10;
                             controller.points = 0;
                             controller.getQuiz();
                             controller.update();
@@ -102,7 +97,8 @@ class _QuizScreenState extends State<QuizScreen> {
                                         onPressed: () {
                                           controller.resetColors();
                                           controller.currentQuestionIndex = 0;
-                                          controller.seconds = 60;
+                                          controller.seconds = 10;
+
                                           controller.points = 0;
                                           controller.getQuiz();
                                           controller.update();
@@ -124,7 +120,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                             width: 40,
                                             height: 40,
                                             child: CircularProgressIndicator(
-                                              value: controller.seconds / 60,
+                                              value: controller.seconds / 10,
                                               valueColor:
                                                   const AlwaysStoppedAnimation(
                                                       Colors.white),
@@ -171,44 +167,40 @@ class _QuizScreenState extends State<QuizScreen> {
 
                                           return GestureDetector(
                                             onTap: () {
-                                              setState(() {
-                                                if (answer.toString() ==
-                                                    controller
-                                                        .optionsList[index]
-                                                        .toString()) {
+                                              if (answer.toString() ==
+                                                  controller.optionsList[index]
+                                                      .toString()) {
+                                                controller.optionsColor[index] =
+                                                    Colors.green;
+
+                                                controller.points =
+                                                    controller.points + 10;
+                                              } else {
+                                                controller.optionsColor[index] =
+                                                    Colors.red;
+
+                                                controller.points =
+                                                    controller.points - 5;
+                                              }
+
+                                              if (controller
+                                                      .currentQuestionIndex <
+                                                  data.length - 1) {
+                                                Future.delayed(
+                                                    const Duration(seconds: 1),
+                                                    () {
+                                                  controller.isLoaded = false;
                                                   controller
-                                                          .optionsColor[index] =
-                                                      Colors.green;
-
-                                                  controller.points =
-                                                      controller.points + 10;
-                                                } else {
-                                                  controller
-                                                          .optionsColor[index] =
-                                                      Colors.red;
-
-                                                  controller.points =
-                                                      controller.points - 5;
-                                                }
-
-                                                if (controller
-                                                        .currentQuestionIndex <
-                                                    data.length - 1) {
-                                                  Future.delayed(
-                                                      const Duration(
-                                                          seconds: 1), () {
-                                                    controller.isLoaded = false;
-                                                    controller
-                                                        .currentQuestionIndex++;
-                                                    controller.resetColors();
-                                                    controller.timer!.cancel();
-                                                    controller.seconds = 60;
-                                                    controller.startTimer();
-                                                  });
-                                                } else {
+                                                      .currentQuestionIndex++;
+                                                  controller.resetColors();
                                                   controller.timer!.cancel();
-                                                }
-                                              });
+                                                  controller.seconds = 60;
+                                                  controller.startTimer();
+                                                });
+                                              } else {
+                                                controller.timer!.cancel();
+                                              }
+                                              controller.update();
                                             },
                                             child: Container(
                                               margin: const EdgeInsets.only(
